@@ -69,6 +69,11 @@ namespace HRTool.Domain.Entities
         public Guid? ManagerId { get; set; }
 
         /// <summary>
+        /// Reference to the user's manager
+        /// </summary>
+        public virtual User? Manager { get; set; }
+
+        /// <summary>
         /// Current project of the user.
         /// </summary>
         public string CurrentProject { get; set; } = string.Empty;

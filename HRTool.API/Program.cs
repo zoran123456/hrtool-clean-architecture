@@ -1,3 +1,5 @@
+using Microsoft.EntityFrameworkCore;
+using HRTool.Infrastructure.Data;
 
 namespace HRTool.API
 {
@@ -8,6 +10,10 @@ namespace HRTool.API
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
+
+            // Register HrDbContext with SQLite provider
+            builder.Services.AddDbContext<HrDbContext>(options =>
+                options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
 
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
