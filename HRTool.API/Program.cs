@@ -1,5 +1,5 @@
 
-namespace HRTool
+namespace HRTool.API
 {
     public class Program
     {
