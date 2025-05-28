@@ -1,13 +1,17 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using HRTool.Application.DTOs;
+using HRTool.Application.DTOs.Admin;
 using HRTool.Domain.Entities;
 using HRTool.Domain.Interfaces;
+using Microsoft.AspNetCore.Identity;
 
 namespace HRTool.Application.Services
 {
     /// <summary>
-    /// Service for user profile management (view/update own info).
+    /// Service for user profile management (view/update own info and admin operations).
     /// </summary>
     public class UserService
     {
@@ -64,6 +68,110 @@ namespace HRTool.Application.Services
             user.Department = dto.Department?.Trim() ?? string.Empty;
             user.CurrentProject = dto.CurrentProject?.Trim() ?? string.Empty;
             // Optionally update audit info (e.g. user.UpdatedAt = DateTime.UtcNow;)
+
+            _userRepository.Update(user);
+            await _unitOfWork.SaveChangesAsync();
+            return (true, null);
+        }
+
+        /// <summary>
+        /// Gets a list of all users (admin view).
+        /// </summary>
+        public async Task<List<AdminUserListDto>> GetAllUsersAsync()
+        {
+            var users = await _userRepository.GetAllAsync();
+            return users.Select(u => new AdminUserListDto
+            {
+                Id = u.Id,
+                FirstName = u.FirstName,
+                LastName = u.LastName,
+                Email = u.Email,
+                Role = u.Role,
+                Department = u.Department,
+                ManagerName = u.Manager != null ? $"{u.Manager.FirstName} {u.Manager.LastName}" : null,
+                IsActive = u.IsOutOfOffice == false // Simulate IsActive (could add real flag if needed)
+            }).ToList();
+        }
+
+        /// <summary>
+        /// Admin creates a new user (with password, role, etc.).
+        /// </summary>
+        public async Task<(AdminUserListDto? User, string? Error)> CreateUserAsync(AdminCreateUserDto dto)
+        {
+            // Check for duplicate email
+            var existing = await _userRepository.GetByEmailAsync(dto.Email.Trim());
+            if (existing != null)
+                return (null, "A user with this email already exists.");
+
+            var user = new User
+            {
+                Id = Guid.NewGuid(),
+                FirstName = dto.FirstName.Trim(),
+                LastName = dto.LastName.Trim(),
+                Email = dto.Email.Trim(),
+                DateOfBirth = dto.DateOfBirth,
+                Skills = dto.Skills?.Trim() ?? string.Empty,
+                Address = dto.Address,
+                Department = dto.Department?.Trim() ?? string.Empty,
+                CurrentProject = dto.CurrentProject?.Trim() ?? string.Empty,
+                Role = dto.Role,
+                ManagerId = dto.ManagerId,
+                IsOutOfOffice = !dto.IsActive, // Simulate IsActive
+                CreatedAt = DateTime.UtcNow
+            };
+
+            var hasher = new PasswordHasher<User>();
+            user.PasswordHash = hasher.HashPassword(user, dto.Password);
+
+            await _userRepository.AddAsync(user);
+            await _unitOfWork.SaveChangesAsync();
+
+            return (new AdminUserListDto
+            {
+                Id = user.Id,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                Email = user.Email,
+                Role = user.Role,
+                Department = user.Department,
+                ManagerName = null, // Could fetch manager if needed
+                IsActive = !user.IsOutOfOffice
+            }, null);
+        }
+
+        /// <summary>
+        /// Admin updates any user (including role, password, IsActive, etc.).
+        /// </summary>
+        public async Task<(bool Success, string? Error)> UpdateUserAsync(Guid userId, AdminUpdateUserDto dto)
+        {
+            var user = await _userRepository.GetByIdAsync(userId);
+            if (user == null) return (false, "User not found");
+
+            // Check for duplicate email (if changed)
+            if (!string.Equals(user.Email, dto.Email.Trim(), StringComparison.OrdinalIgnoreCase))
+            {
+                var existing = await _userRepository.GetByEmailAsync(dto.Email.Trim());
+                if (existing != null && existing.Id != userId)
+                    return (false, "A user with this email already exists.");
+            }
+
+            user.FirstName = dto.FirstName.Trim();
+            user.LastName = dto.LastName.Trim();
+            user.Email = dto.Email.Trim();
+            user.DateOfBirth = dto.DateOfBirth;
+            user.Skills = dto.Skills?.Trim() ?? string.Empty;
+            user.Address = dto.Address;
+            user.Department = dto.Department?.Trim() ?? string.Empty;
+            user.CurrentProject = dto.CurrentProject?.Trim() ?? string.Empty;
+            user.Role = dto.Role;
+            user.ManagerId = dto.ManagerId;
+            user.IsOutOfOffice = !dto.IsActive; // Simulate IsActive
+
+            if (!string.IsNullOrWhiteSpace(dto.Password))
+            {
+                var hasher = new PasswordHasher<User>();
+                user.PasswordHash = hasher.HashPassword(user, dto.Password);
+            }
 
             _userRepository.Update(user);
             await _unitOfWork.SaveChangesAsync();

@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using System.Collections.Generic;
+using HRTool.Application.DTOs.Admin;
 
 namespace HRTool.API.Controllers
 {
@@ -49,6 +51,45 @@ namespace HRTool.API.Controllers
             var (success, error) = await _userService.UpdateProfileAsync(guid, dto);
             if (!success)
                 return BadRequest(new { error });
+            return NoContent();
+        }
+
+        // ------------------- ADMIN ENDPOINTS -------------------
+        [HttpGet("admin/users")]
+        [Authorize(Roles = "Admin")]
+        public async Task<ActionResult<List<AdminUserListDto>>> GetAllUsers()
+        {
+            var users = await _userService.GetAllUsersAsync();
+            return Ok(users);
+        }
+
+        [HttpPost("admin/users")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> CreateUser([FromBody] AdminCreateUserDto dto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+            var (user, error) = await _userService.CreateUserAsync(dto);
+            if (error != null)
+                return Conflict(new { error });
+            return CreatedAtAction(nameof(GetAllUsers), new { id = user!.Id }, user);
+        }
+
+        [HttpPut("admin/users/{id}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> UpdateUser(Guid id, [FromBody] AdminUpdateUserDto dto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+            var (success, error) = await _userService.UpdateUserAsync(id, dto);
+            if (!success)
+            {
+                if (error == "User not found")
+                    return NotFound();
+                if (error != null && error.Contains("exists"))
+                    return Conflict(new { error });
+                return BadRequest(new { error });
+            }
             return NoContent();
         }
     }
