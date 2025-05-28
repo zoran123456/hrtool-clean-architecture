@@ -1,3 +1,13 @@
+/// <summary>
+/// Utility class for seeding the initial admin user at application startup.
+/// 
+/// NOTE: This class resides in the API layer because seeding is an application startup concern.
+/// It is allowed to reference Infrastructure (DbContext, repositories) for the purpose of
+/// data initialization, as the API layer is responsible for application composition and setup.
+/// 
+/// DO NOT move this class into the Application or Domain layers.
+/// </summary>
+
 using HRTool.Domain.Entities;
 using HRTool.Domain.Interfaces;
 using HRTool.Infrastructure.Data;
