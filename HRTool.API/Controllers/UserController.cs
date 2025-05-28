@@ -8,6 +8,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using HRTool.Application.DTOs.Admin;
+using HRTool.Application.DTOs;
 
 namespace HRTool.API.Controllers
 {
@@ -52,6 +53,17 @@ namespace HRTool.API.Controllers
             if (!success)
                 return BadRequest(new { error });
             return NoContent();
+        }
+
+        /// <summary>
+        /// Gets the public people directory (all active users, basic info).
+        /// </summary>
+        [HttpGet("/api/directory")]
+        [Authorize]
+        public async Task<ActionResult<List<DirectoryUserDto>>> GetDirectory()
+        {
+            var directory = await _userService.GetDirectoryAsync();
+            return Ok(directory);
         }
 
         // ------------------- ADMIN ENDPOINTS -------------------

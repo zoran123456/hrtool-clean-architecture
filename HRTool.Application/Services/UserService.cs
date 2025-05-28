@@ -94,6 +94,27 @@ namespace HRTool.Application.Services
         }
 
         /// <summary>
+        /// Gets the public people directory (all active users, basic info).
+        /// </summary>
+        public async Task<List<DirectoryUserDto>> GetDirectoryAsync()
+        {
+            var users = await _userRepository.GetAllAsync();
+            return users
+                .Where(u => !u.IsOutOfOffice) // Simulate IsActive
+                .OrderBy(u => u.FirstName).ThenBy(u => u.LastName)
+                .Select(u => new DirectoryUserDto
+                {
+                    FirstName = u.FirstName,
+                    LastName = u.LastName,
+                    Role = u.Role,
+                    Department = u.Department,
+                    City = u.Address?.City ?? string.Empty,
+                    Country = u.Address?.Country ?? string.Empty
+                })
+                .ToList();
+        }
+
+        /// <summary>
         /// Admin creates a new user (with password, role, etc.).
         /// </summary>
         public async Task<(AdminUserListDto? User, string? Error)> CreateUserAsync(AdminCreateUserDto dto)
