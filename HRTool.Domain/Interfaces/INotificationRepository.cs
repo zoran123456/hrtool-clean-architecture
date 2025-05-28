@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using HRTool.Domain.Entities;
 
 namespace HRTool.Domain.Interfaces
@@ -9,10 +10,29 @@ namespace HRTool.Domain.Interfaces
     /// </summary>
     public interface INotificationRepository
     {
-        Notification? GetById(Guid id);
-        IEnumerable<Notification> GetAll();
-        void Add(Notification notification);
+        /// <summary>
+        /// Gets a notification by its unique identifier.
+        /// </summary>
+        Task<Notification?> GetByIdAsync(Guid id);
+
+        /// <summary>
+        /// Gets all notifications.
+        /// </summary>
+        Task<IEnumerable<Notification>> GetAllAsync();
+
+        /// <summary>
+        /// Adds a new notification.
+        /// </summary>
+        Task AddAsync(Notification notification);
+
+        /// <summary>
+        /// Updates an existing notification.
+        /// </summary>
         void Update(Notification notification);
-        void Delete(Guid id);
+
+        /// <summary>
+        /// Deletes a notification by its unique identifier.
+        /// </summary>
+        Task DeleteAsync(Guid id);
     }
 }

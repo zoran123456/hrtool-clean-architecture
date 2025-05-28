@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using HRTool.Domain.Entities;
 
 namespace HRTool.Domain.Interfaces
@@ -9,10 +10,29 @@ namespace HRTool.Domain.Interfaces
     /// </summary>
     public interface ICompanyLinkRepository
     {
-        CompanyLink? GetById(Guid id);
-        IEnumerable<CompanyLink> GetAll();
-        void Add(CompanyLink link);
+        /// <summary>
+        /// Gets a company link by its unique identifier.
+        /// </summary>
+        Task<CompanyLink?> GetByIdAsync(Guid id);
+
+        /// <summary>
+        /// Gets all company links.
+        /// </summary>
+        Task<IEnumerable<CompanyLink>> GetAllAsync();
+
+        /// <summary>
+        /// Adds a new company link.
+        /// </summary>
+        Task AddAsync(CompanyLink link);
+
+        /// <summary>
+        /// Updates an existing company link.
+        /// </summary>
         void Update(CompanyLink link);
-        void Delete(Guid id);
+
+        /// <summary>
+        /// Deletes a company link by its unique identifier.
+        /// </summary>
+        Task DeleteAsync(Guid id);
     }
 }
