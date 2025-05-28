@@ -27,6 +27,7 @@ namespace HRTool.Infrastructure.Data
                 b.Property(u => u.Department).HasMaxLength(100);
                 b.Property(u => u.Skills).HasMaxLength(500);
                 b.Property(u => u.CurrentProject).HasMaxLength(200);
+                b.Property(u => u.PasswordHash).IsRequired();
                 b.HasOne(u => u.Manager)
                  .WithMany()
                  .HasForeignKey(u => u.ManagerId)

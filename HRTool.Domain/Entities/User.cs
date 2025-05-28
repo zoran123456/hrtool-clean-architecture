@@ -82,5 +82,10 @@ namespace HRTool.Domain.Entities
         /// Date and time when the user was created (for new-hire highlighting).
         /// </summary>
         public DateTime CreatedAt { get; set; }
+
+        /// <summary>
+        /// Hash of the user's password (for authentication).
+        /// </summary>
+        public string PasswordHash { get; set; } = string.Empty;
     }
 }
