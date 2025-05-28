@@ -15,7 +15,9 @@
       "launchBrowser": true,
       "launchUrl": "swagger",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "JWT_KEY": "UNSAFE-DEVELOPMENT-ONLY-123123key",
+        "HRTOOL_ADMIN_PASSWORD": "UNSAFE-DEVELOPMENT-ONLY-Admin@123"
       },
       "dotnetRunMessages": true,
       "applicationUrl": "https://localhost:7292;http://localhost:5134"

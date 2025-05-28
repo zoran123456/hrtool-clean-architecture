@@ -16,6 +16,11 @@ namespace HRTool.Domain.Interfaces
         Task<User?> GetByIdAsync(Guid id);
 
         /// <summary>
+        /// Gets a user by their role.
+        /// </summary>
+        Task<User?> GetByRoleAsync(Role role);
+
+        /// <summary>
         /// Gets all users.
         /// </summary>
         Task<IEnumerable<User>> GetAllAsync();

@@ -29,6 +29,14 @@ namespace HRTool.Infrastructure
         }
 
         /// <summary>
+        /// Gets a user by their unique identifier.
+        /// </summary>
+        public async Task<User?> GetByRoleAsync(Role role)
+        {
+            return await _context.Users.Include(u => u.Manager).FirstOrDefaultAsync(u => u.Role == role);
+        }
+
+        /// <summary>
         /// Gets all users.
         /// </summary>
         public async Task<IEnumerable<User>> GetAllAsync()

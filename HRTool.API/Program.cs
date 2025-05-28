@@ -11,25 +11,30 @@ namespace HRTool.API
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
-
-            // Register HrDbContext with SQLite provider
             builder.Services.AddDbContext<HrDbContext>(options =>
                 options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-            // Register repositories and unit of work
             builder.Services.AddProjectRepositories();
-
-            // Register AuthService
             builder.Services.AddScoped<IAuthService, AuthService>();
 
-            // Configure JWT authentication
+            // JWT setup
             var jwtSettings = builder.Configuration.GetSection("Jwt");
-            var key = Encoding.UTF8.GetBytes(jwtSettings["Key"]!);
+            var jwtKey = Environment.GetEnvironmentVariable("JWT_KEY");
+            if (string.IsNullOrWhiteSpace(jwtKey))
+            {
+                throw new ArgumentException("JWT_KEY environment variable is not set! Please set it before running the application.");
+            }
+            var key = Encoding.UTF8.GetBytes(jwtKey);
+
+            // Issuer and Audience from appsettings, override with env var if set
+            var issuer = Environment.GetEnvironmentVariable("JWT_ISSUER") ?? jwtSettings["Issuer"];
+            var audience = Environment.GetEnvironmentVariable("JWT_AUDIENCE") ?? jwtSettings["Audience"];
+
             builder.Services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -43,8 +48,8 @@ namespace HRTool.API
                     ValidateAudience = true,
                     ValidateLifetime = true,
                     ValidateIssuerSigningKey = true,
-                    ValidIssuer = jwtSettings["Issuer"],
-                    ValidAudience = jwtSettings["Audience"],
+                    ValidIssuer = issuer,
+                    ValidAudience = audience,
                     IssuerSigningKey = new SymmetricSecurityKey(key)
                 };
             });
@@ -60,7 +65,8 @@ namespace HRTool.API
             {
                 var db = scope.ServiceProvider.GetRequiredService<HrDbContext>();
                 var userRepo = scope.ServiceProvider.GetRequiredService<IUserRepository>();
-                AdminSeeder.SeedAdminIfNoneExists(db, userRepo);
+                var unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                await AdminSeeder.SeedAdminIfNoneExistsAsync(db, userRepo, unitOfWork);
             }
 
             // Configure the HTTP request pipeline.
