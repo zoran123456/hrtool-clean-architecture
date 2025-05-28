@@ -1,10 +1,13 @@
 using HRTool.API.Extensions;
 using HRTool.API.Services;
 using HRTool.API.Utils;
+using HRTool.Application;
+using HRTool.Application.Services;
 using HRTool.Domain.Interfaces;
 using HRTool.Infrastructure.Data;
 using HRTool.Infrastructure.Extensions;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
 
 namespace HRTool.API
 {
@@ -20,12 +23,13 @@ namespace HRTool.API
 
             builder.Services.AddProjectRepositories();
             builder.Services.AddScoped<IAuthService, AuthService>();
+            builder.Services.AddScoped<UserService>();
 
             builder.Services.AddJwtAuthentication(builder.Configuration);
 
             builder.Services.AddControllers();
             builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
+            builder.Services.AddSwaggerWithJwt();
 
             var app = builder.Build();
 

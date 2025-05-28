@@ -22,10 +22,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Controllers\" />
-  </ItemGroup>
-
-  <ItemGroup>
+    <ProjectReference Include="..\HRTool.Application\HRTool.Application.csproj" />
     <ProjectReference Include="..\HRTool.Infrastructure\HRTool.Infrastructure.csproj" />
   </ItemGroup>
 
