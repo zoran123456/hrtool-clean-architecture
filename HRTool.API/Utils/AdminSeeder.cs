@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Identity;
 using System;
 using System.Linq;
 
-namespace HRTool.API
+namespace HRTool.API.Utils
 {
     public static class AdminSeeder
     {
@@ -29,7 +29,7 @@ namespace HRTool.API
                     Role = Role.Admin,
                     DateOfBirth = DateTime.UtcNow.AddYears(-30),
                     Skills = "",
-                    Address = new HRTool.Domain.ValueObjects.Address { Street = "", City = "", Country = "" },
+                    Address = new Domain.ValueObjects.Address { Street = "", City = "", Country = "" },
                     Department = "IT",
                     IsOutOfOffice = false,
                     CreatedAt = DateTime.UtcNow,

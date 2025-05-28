@@ -10,7 +10,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace HRTool.API
+namespace HRTool.API.Services
 {
     /// <summary>
     /// Service for authenticating users and generating JWT tokens.
@@ -39,7 +39,7 @@ namespace HRTool.API
         public async Task<string?> AuthenticateAsync(string email, string password)
         {
             var users = await _userRepository.GetAllAsync();
-            var user = System.Linq.Enumerable.FirstOrDefault(users, u => u.Email == email);
+            var user = users.FirstOrDefault(u => u.Email == email);
             if (user == null)
                 return null;
 
