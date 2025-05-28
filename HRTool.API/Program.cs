@@ -1,13 +1,10 @@
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
-using System.Text;
-using HRTool.Infrastructure.Data;
-using HRTool.Domain.Interfaces;
-using HRTool.Infrastructure;
-using HRTool.Infrastructure.Extensions;
+using HRTool.API.Extensions;
 using HRTool.API.Services;
 using HRTool.API.Utils;
+using HRTool.Domain.Interfaces;
+using HRTool.Infrastructure.Data;
+using HRTool.Infrastructure.Extensions;
+using Microsoft.EntityFrameworkCore;
 
 namespace HRTool.API
 {
@@ -24,37 +21,7 @@ namespace HRTool.API
             builder.Services.AddProjectRepositories();
             builder.Services.AddScoped<IAuthService, AuthService>();
 
-            // JWT setup
-            var jwtSettings = builder.Configuration.GetSection("Jwt");
-            var jwtKey = Environment.GetEnvironmentVariable("JWT_KEY");
-            if (string.IsNullOrWhiteSpace(jwtKey))
-            {
-                throw new ArgumentException("JWT_KEY environment variable is not set! Please set it before running the application.");
-            }
-            var key = Encoding.UTF8.GetBytes(jwtKey);
-
-            // Issuer and Audience from appsettings, override with env var if set
-            var issuer = Environment.GetEnvironmentVariable("JWT_ISSUER") ?? jwtSettings["Issuer"];
-            var audience = Environment.GetEnvironmentVariable("JWT_AUDIENCE") ?? jwtSettings["Audience"];
-
-            builder.Services.AddAuthentication(options =>
-            {
-                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            })
-            .AddJwtBearer(options =>
-            {
-                options.TokenValidationParameters = new TokenValidationParameters
-                {
-                    ValidateIssuer = true,
-                    ValidateAudience = true,
-                    ValidateLifetime = true,
-                    ValidateIssuerSigningKey = true,
-                    ValidIssuer = issuer,
-                    ValidAudience = audience,
-                    IssuerSigningKey = new SymmetricSecurityKey(key)
-                };
-            });
+            builder.Services.AddJwtAuthentication(builder.Configuration);
 
             builder.Services.AddControllers();
             builder.Services.AddEndpointsApiExplorer();
@@ -63,13 +30,7 @@ namespace HRTool.API
             var app = builder.Build();
 
             // Seed admin user if none exists
-            using (var scope = app.Services.CreateScope())
-            {
-                var db = scope.ServiceProvider.GetRequiredService<HrDbContext>();
-                var userRepo = scope.ServiceProvider.GetRequiredService<IUserRepository>();
-                var unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
-                await AdminSeeder.SeedAdminIfNoneExistsAsync(db, userRepo, unitOfWork);
-            }
+            await SeedAdminUserIfMissing(app.Services);
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
@@ -86,6 +47,15 @@ namespace HRTool.API
             app.MapControllers();
 
             app.Run();
+        }
+
+        private static async Task SeedAdminUserIfMissing(IServiceProvider services)
+        {
+            using var scope = services.CreateScope();
+            var db = scope.ServiceProvider.GetRequiredService<HrDbContext>();
+            var userRepo = scope.ServiceProvider.GetRequiredService<IUserRepository>();
+            var unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+            await AdminSeeder.SeedAdminIfNoneExistsAsync(db, userRepo, unitOfWork);
         }
     }
 }
