@@ -9,32 +9,37 @@ namespace HRTool.API
 {
     public static class AdminSeeder
     {
-        public static void SeedAdminIfNoneExists(HrDbContext db, IUserRepository userRepo)
-        {
-            db.Database.EnsureCreated();
-            var adminExists = db.Users.Any(u => u.Role == Role.Admin);
-            if (!adminExists)
+            public static void SeedAdminIfNoneExists(HrDbContext db)
             {
-                var hasher = new PasswordHasher<User>();
-                var admin = new User
+                db.Database.EnsureCreated();
+                var adminExists = db.Users.Any(u => u.Role == Role.Admin);
+                if (!adminExists)
                 {
-                    Id = Guid.NewGuid(),
-                    FirstName = "Admin",
-                    LastName = "User",
-                    Email = "admin@hrtool.local",
-                    Role = Role.Admin,
-                    DateOfBirth = DateTime.UtcNow.AddYears(-30),
-                    Skills = "",
-                    Address = new HRTool.Domain.ValueObjects.Address { Street = "", City = "", Country = "" },
-                    Department = "IT",
-                    IsOutOfOffice = false,
-                    CreatedAt = DateTime.UtcNow,
-                    CurrentProject = "",
-                };
-                admin.PasswordHash = hasher.HashPassword(admin, "Admin@123");
-                db.Users.Add(admin);
-                db.SaveChanges();
+                    var password = Environment.GetEnvironmentVariable("HRTOOL_ADMIN_PASSWORD");
+                    if (string.IsNullOrWhiteSpace(password))
+                        throw new InvalidOperationException("Admin password must be set in HRTOOL_ADMIN_PASSWORD environment variable.");
+
+                    var hasher = new PasswordHasher<User>();
+                    var admin = new User
+                    {
+                        Id = Guid.NewGuid(),
+                        FirstName = "Admin",
+                        LastName = "User",
+                        Email = "admin@hrtool.local",
+                        Role = Role.Admin,
+                        DateOfBirth = DateTime.UtcNow.AddYears(-30),
+                        Skills = "",
+                        Address = new HRTool.Domain.ValueObjects.Address { Street = "", City = "", Country = "" },
+                        Department = "IT",
+                        IsOutOfOffice = false,
+                        CreatedAt = DateTime.UtcNow,
+                        CurrentProject = "",
+                    };
+                    admin.PasswordHash = hasher.HashPassword(admin, password);
+                    db.Users.Add(admin);
+                    db.SaveChanges();
+                    // Add logging here if needed
+                }
             }
-        }
     }
 }
