@@ -38,8 +38,7 @@ namespace HRTool.API.Services
         /// </summary>
         public async Task<string?> AuthenticateAsync(string email, string password)
         {
-            var users = await _userRepository.GetAllAsync();
-            var user = users.FirstOrDefault(u => u.Email == email);
+            var user = await _userRepository.GetByEmailAsync(email);
             if (user == null)
                 return null;
 
@@ -49,7 +48,8 @@ namespace HRTool.API.Services
 
             // Create JWT
             var jwtSection = _config.GetSection("Jwt");
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSection["Key"]!));
+            var jwtKey = System.Environment.GetEnvironmentVariable("JWT_KEY");
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey!));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
             var claims = new List<Claim>
             {

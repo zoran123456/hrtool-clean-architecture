@@ -21,6 +21,11 @@ namespace HRTool.Domain.Interfaces
         Task<User?> GetByRoleAsync(Role role);
 
         /// <summary>
+        /// Gets a user by their email address.
+        /// </summary>
+        Task<User?> GetByEmailAsync(string email);
+
+        /// <summary>
         /// Gets all users.
         /// </summary>
         Task<IEnumerable<User>> GetAllAsync();

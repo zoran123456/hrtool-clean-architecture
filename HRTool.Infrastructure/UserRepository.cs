@@ -29,11 +29,19 @@ namespace HRTool.Infrastructure
         }
 
         /// <summary>
-        /// Gets a user by their unique identifier.
+        /// Gets a user by their role.
         /// </summary>
         public async Task<User?> GetByRoleAsync(Role role)
         {
             return await _context.Users.Include(u => u.Manager).FirstOrDefaultAsync(u => u.Role == role);
+        }
+
+        /// <summary>
+        /// Gets a user by their email address.
+        /// </summary>
+        public async Task<User?> GetByEmailAsync(string email)
+        {
+            return await _context.Users.Include(u => u.Manager).FirstOrDefaultAsync(u => u.Email == email);
         }
 
         /// <summary>
