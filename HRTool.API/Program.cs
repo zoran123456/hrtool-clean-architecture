@@ -24,6 +24,8 @@ namespace HRTool.API
             builder.Services.AddProjectRepositories();
             builder.Services.AddScoped<IAuthService, AuthService>();
             builder.Services.AddScoped<UserService>();
+            builder.Services.AddScoped<NotificationService>();
+            builder.Services.AddScoped<LinkService>();
 
             builder.Services.AddJwtAuthentication(builder.Configuration);
 
