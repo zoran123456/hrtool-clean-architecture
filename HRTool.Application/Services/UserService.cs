@@ -248,5 +248,57 @@ namespace HRTool.Application.Services
                 })
                 .ToList();
         }
+
+        /// <summary>
+        /// Gets all users whose birthday (month/day) matches the given date.
+        /// </summary>
+        public async Task<List<UserProfileDto>> GetUsersWithBirthdayOnAsync(DateTime date)
+        {
+            var users = await _userRepository.GetAllAsync();
+            int month = date.Month;
+            int day = date.Day;
+            return users
+                .Where(u => u.DateOfBirth.Month == month && u.DateOfBirth.Day == day && !u.IsOutOfOffice)
+                .Select(u => new UserProfileDto
+                {
+                    Id = u.Id,
+                    FirstName = u.FirstName,
+                    LastName = u.LastName,
+                    Email = u.Email,
+                    DateOfBirth = u.DateOfBirth,
+                    Skills = u.Skills,
+                    Address = u.Address,
+                    Department = u.Department,
+                    CurrentProject = u.CurrentProject,
+                    ManagerName = u.Manager != null ? $"{u.Manager.FirstName} {u.Manager.LastName}" : null
+                })
+                .ToList();
+        }
+
+        /// <summary>
+        /// Gets all users created within the last X days (new hires).
+        /// </summary>
+        public async Task<List<UserProfileDto>> GetRecentUsersAsync(int days)
+        {
+            var users = await _userRepository.GetAllAsync();
+            var since = DateTime.UtcNow.AddDays(-days);
+            return users
+                .Where(u => u.CreatedAt >= since && !u.IsOutOfOffice)
+                .OrderByDescending(u => u.CreatedAt)
+                .Select(u => new UserProfileDto
+                {
+                    Id = u.Id,
+                    FirstName = u.FirstName,
+                    LastName = u.LastName,
+                    Email = u.Email,
+                    DateOfBirth = u.DateOfBirth,
+                    Skills = u.Skills,
+                    Address = u.Address,
+                    Department = u.Department,
+                    CurrentProject = u.CurrentProject,
+                    ManagerName = u.Manager != null ? $"{u.Manager.FirstName} {u.Manager.LastName}" : null
+                })
+                .ToList();
+        }
     }
 }

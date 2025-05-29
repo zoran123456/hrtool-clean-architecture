@@ -83,6 +83,38 @@ namespace HRTool.API.Controllers
             return Ok(directory);
         }
 
+        /// <summary>
+        /// Gets users whose birthday is today.
+        /// </summary>
+        [HttpGet("birthdays/today")]
+        public async Task<ActionResult<List<UserProfileDto>>> GetTodaysBirthdays()
+        {
+            var today = DateTime.UtcNow.Date;
+            var users = await _userService.GetUsersWithBirthdayOnAsync(today);
+            return Ok(users);
+        }
+
+        /// <summary>
+        /// Gets users whose birthday is tomorrow.
+        /// </summary>
+        [HttpGet("birthdays/tomorrow")]
+        public async Task<ActionResult<List<UserProfileDto>>> GetTomorrowsBirthdays()
+        {
+            var tomorrow = DateTime.UtcNow.Date.AddDays(1);
+            var users = await _userService.GetUsersWithBirthdayOnAsync(tomorrow);
+            return Ok(users);
+        }
+
+        /// <summary>
+        /// Gets new employees (joined within the last X days, default 30).
+        /// </summary>
+        [HttpGet("new")]
+        public async Task<ActionResult<List<UserProfileDto>>> GetNewEmployees([FromQuery] int days = 30)
+        {
+            var users = await _userService.GetRecentUsersAsync(days);
+            return Ok(users);
+        }
+
         // ------------------- ADMIN ENDPOINTS -------------------
         [HttpGet("admin/users")]
         [Authorize(Roles = "Admin")]
