@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using HRTool.Domain.Entities;
@@ -50,6 +51,18 @@ namespace HRTool.Infrastructure
         public async Task<IEnumerable<User>> GetAllAsync()
         {
             return await _context.Users.Include(u => u.Manager).ToListAsync();
+        }
+
+        /// <summary>
+        /// Gets all users who are out of office on the given date (inclusive, ignores time).
+        /// </summary>
+        public async Task<IEnumerable<User>> GetOutOfOfficeUsersAsync(DateTime date)
+        {
+            var day = date.Date;
+            return await _context.Users
+                .Include(u => u.Manager)
+                .Where(u => u.OutOfOfficeUntil.HasValue && u.OutOfOfficeUntil.Value.Date >= day)
+                .ToListAsync();
         }
 
         /// <summary>

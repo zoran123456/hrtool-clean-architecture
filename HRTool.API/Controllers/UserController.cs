@@ -56,6 +56,23 @@ namespace HRTool.API.Controllers
         }
 
         /// <summary>
+        /// Sets the out-of-office status for the current authenticated user.
+        /// </summary>
+        [HttpPut("me/outofoffice")]
+        public async Task<IActionResult> SetOutOfOffice([FromBody] SetOutOfOfficeDto dto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? User.FindFirstValue(ClaimTypes.Name) ?? User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!Guid.TryParse(userId, out var guid))
+                return Unauthorized();
+            var (success, error) = await _userService.SetOutOfOfficeAsync(guid, dto);
+            if (!success)
+                return BadRequest(new { error });
+            return NoContent();
+        }
+
+        /// <summary>
         /// Gets the public people directory (all active users, basic info).
         /// </summary>
         [HttpGet("/api/directory")]

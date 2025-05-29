@@ -31,6 +31,11 @@ namespace HRTool.Domain.Interfaces
         Task<IEnumerable<User>> GetAllAsync();
 
         /// <summary>
+        /// Gets all users who are out of office on the given date (inclusive, ignores time).
+        /// </summary>
+        Task<IEnumerable<User>> GetOutOfOfficeUsersAsync(DateTime date);
+
+        /// <summary>
         /// Adds a new user.
         /// </summary>
         Task AddAsync(User user);

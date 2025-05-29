@@ -198,5 +198,55 @@ namespace HRTool.Application.Services
             await _unitOfWork.SaveChangesAsync();
             return (true, null);
         }
+
+        /// <summary>
+        /// Sets the out-of-office status for the specified user. Only the user or an admin can set this.
+        /// </summary>
+        /// <param name="userId">The user to update.</param>
+        /// <param name="dto">The OOO status DTO.</param>
+        /// <returns>Success and error message if any.</returns>
+        public async Task<(bool Success, string? Error)> SetOutOfOfficeAsync(Guid userId, SetOutOfOfficeDto dto)
+        {
+            var user = await _userRepository.GetByIdAsync(userId);
+            if (user == null) return (false, "User not found");
+
+            var today = DateTime.UtcNow.Date;
+            DateTime? until = dto.EndDate?.Date ?? today;
+            if (until < today)
+                return (false, "Out-of-office end date cannot be in the past.");
+
+            // We assume any date set includes that day as out-of-office.
+            user.OutOfOfficeUntil = until;
+            user.IsOutOfOffice = until >= today; // Derived: out if today <= OutOfOfficeUntil
+
+            _userRepository.Update(user);
+            await _unitOfWork.SaveChangesAsync();
+            return (true, null);
+        }
+
+        /// <summary>
+        /// Gets all users who are out of office on the given date (inclusive, ignores time).
+        /// </summary>
+        public async Task<List<UserProfileDto>> GetOutOfOfficeUsersAsync(DateTime date)
+        {
+            var users = await _userRepository.GetAllAsync();
+            var day = date.Date;
+            return users
+                .Where(u => u.OutOfOfficeUntil.HasValue && u.OutOfOfficeUntil.Value.Date >= day)
+                .Select(u => new UserProfileDto
+                {
+                    Id = u.Id,
+                    FirstName = u.FirstName,
+                    LastName = u.LastName,
+                    Email = u.Email,
+                    DateOfBirth = u.DateOfBirth,
+                    Skills = u.Skills,
+                    Address = u.Address,
+                    Department = u.Department,
+                    CurrentProject = u.CurrentProject,
+                    ManagerName = u.Manager != null ? $"{u.Manager.FirstName} {u.Manager.LastName}" : null
+                })
+                .ToList();
+        }
     }
 }
