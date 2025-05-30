@@ -37,8 +37,8 @@ namespace HRTool.API.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Create([FromBody] CreateCompanyLinkDto dto)
         {
-            if (string.IsNullOrWhiteSpace(dto.Title) || string.IsNullOrWhiteSpace(dto.Url))
-                return BadRequest("Title and Url are required.");
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
             try
             {
                 var link = await _linkService.CreateAsync(dto);

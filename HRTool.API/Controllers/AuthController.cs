@@ -1,6 +1,7 @@
 using HRTool.API.Services;
 using HRTool.Domain.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 
 namespace HRTool.API.Controllers
@@ -22,6 +23,8 @@ namespace HRTool.API.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequest request)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
             var token = await _authService.AuthenticateAsync(request.Email, request.Password);
             if (token == null)
                 return Unauthorized();
@@ -34,7 +37,12 @@ namespace HRTool.API.Controllers
     /// </summary>
     public class LoginRequest
     {
+        [Required]
+        [EmailAddress]
         public string Email { get; set; } = string.Empty;
+
+        [Required]
+        [StringLength(100, MinimumLength = 6)]
         public string Password { get; set; } = string.Empty;
     }
 }

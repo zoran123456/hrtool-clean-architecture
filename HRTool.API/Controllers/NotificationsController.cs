@@ -35,8 +35,8 @@ namespace HRTool.API.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Create([FromBody] CreateNotificationDto dto)
         {
-            if (string.IsNullOrWhiteSpace(dto.Title) || string.IsNullOrWhiteSpace(dto.Message))
-                return BadRequest("Title and Message are required.");
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
             var notification = await _notificationService.CreateAsync(dto);
             return CreatedAtAction(nameof(GetById), new { id = notification.Id }, notification);
         }
