@@ -39,6 +39,9 @@ namespace HRTool.API
             // Seed admin user if none exists
             await SeedAdminUserIfMissing(app.Services);
 
+            // Conditionally seed test data
+            await SeedTestDataIfEnabled(app.Services);
+
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
@@ -66,6 +69,17 @@ namespace HRTool.API
             var userRepo = scope.ServiceProvider.GetRequiredService<IUserRepository>();
             var unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
             await AdminSeeder.SeedAdminIfNoneExistsAsync(db, userRepo, unitOfWork);
+        }
+
+        private static async Task SeedTestDataIfEnabled(IServiceProvider services)
+        {
+            using var scope = services.CreateScope();
+            var config = scope.ServiceProvider.GetRequiredService<IConfiguration>();
+            if (config.GetValue<bool>("EnableTestDataSeeding"))
+            {
+                var db = scope.ServiceProvider.GetRequiredService<HrDbContext>();
+                await DataSeeder.SeedTestDataAsync(db);
+            }
         }
     }
 }
