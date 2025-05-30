@@ -8,7 +8,7 @@ using HRTool.Application.Services;
 namespace HRTool.API.Controllers
 {
     [ApiController]
-    [Route("api")]
+    [Route("api/[controller]")]
     public class CompanyLinksController : ControllerBase
     {
         private readonly LinkService _linkService;
@@ -21,8 +21,8 @@ namespace HRTool.API.Controllers
         /// <summary>
         /// Gets all company links (for dashboard display). Any authenticated user can call this.
         /// </summary>
-        [HttpGet("links")]
         [Authorize]
+        [HttpGet]
         public async Task<IActionResult> GetAllLinks()
         {
             var links = await _linkService.GetAllAsync();
@@ -33,7 +33,7 @@ namespace HRTool.API.Controllers
         /// Admin: Creates a new company link.
         /// </summary>
         /// <param name="dto">The link data (title, url).</param>
-        [HttpPost("admin/links")]
+        [HttpPost("admin")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Create([FromBody] CreateCompanyLinkDto dto)
         {
@@ -55,7 +55,7 @@ namespace HRTool.API.Controllers
         /// </summary>
         /// <param name="id">The link id.</param>
         /// <param name="dto">The updated link data.</param>
-        [HttpPut("admin/links/{id}")]
+        [HttpPut("admin/{id}")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Update(Guid id, [FromBody] UpdateCompanyLinkDto dto)
         {
@@ -68,7 +68,7 @@ namespace HRTool.API.Controllers
         /// Admin: Deletes a company link.
         /// </summary>
         /// <param name="id">The link id.</param>
-        [HttpDelete("admin/links/{id}")]
+        [HttpDelete("admin/{id}")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(Guid id)
         {
@@ -81,7 +81,7 @@ namespace HRTool.API.Controllers
         /// Gets a company link by id (for admin or future use).
         /// </summary>
         /// <param name="id">The link id.</param>
-        [HttpGet("admin/links/{id}")]
+        [HttpGet("admin/{id}")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetById(Guid id)
         {

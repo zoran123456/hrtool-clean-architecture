@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace HRTool.API.Controllers
 {
     [ApiController]
-    [Route("api/dashboard")]
+    [Route("api/[controller]")]
     [Authorize]
     public class DashboardController : ControllerBase
     {

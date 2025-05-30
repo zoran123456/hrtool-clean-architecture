@@ -13,7 +13,7 @@ using HRTool.Application.DTOs;
 namespace HRTool.API.Controllers
 {
     [ApiController]
-    [Route("api/user")]
+    [Route("api/[controller]")]
     [Authorize]
     public class UserController : ControllerBase
     {
