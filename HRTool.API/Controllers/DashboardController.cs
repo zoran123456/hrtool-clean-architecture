@@ -6,6 +6,7 @@ using HRTool.Application.DTOs;
 using HRTool.Application.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 
 namespace HRTool.API.Controllers
 {
@@ -17,12 +18,14 @@ namespace HRTool.API.Controllers
         private readonly UserService _userService;
         private readonly NotificationService _notificationService;
         private readonly LinkService _linkService;
+        private readonly ILogger<DashboardController> _logger;
 
-        public DashboardController(UserService userService, NotificationService notificationService, LinkService linkService)
+        public DashboardController(UserService userService, NotificationService notificationService, LinkService linkService, ILogger<DashboardController> logger)
         {
             _userService = userService;
             _notificationService = notificationService;
             _linkService = linkService;
+            _logger = logger;
         }
 
         /// <summary>
@@ -60,6 +63,7 @@ namespace HRTool.API.Controllers
                 Links = links
             };
 
+            _logger.LogInformation("Dashboard data retrieved for user: {UserId}", userId);
             return Ok(dto);
         }
     }

@@ -1,6 +1,7 @@
 using HRTool.API.Services;
 using HRTool.Domain.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 
@@ -11,10 +12,12 @@ namespace HRTool.API.Controllers
     public class AuthController : ControllerBase
     {
         private readonly IAuthService _authService;
+        private readonly ILogger<AuthController> _logger;
 
-        public AuthController(IAuthService authService)
+        public AuthController(IAuthService authService, ILogger<AuthController> logger)
         {
             _authService = authService;
+            _logger = logger;
         }
 
         /// <summary>
@@ -27,7 +30,11 @@ namespace HRTool.API.Controllers
                 return BadRequest(ModelState);
             var token = await _authService.AuthenticateAsync(request.Email, request.Password);
             if (token == null)
+            {
+                _logger.LogWarning("Failed login attempt for email: {Email}", request.Email);
                 return Unauthorized();
+            }
+            _logger.LogInformation("User logged in: {Email}", request.Email);
             return Ok(new { token });
         }
     }

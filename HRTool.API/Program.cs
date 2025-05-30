@@ -1,6 +1,7 @@
 using HRTool.API.Extensions;
 using HRTool.API.Services;
 using HRTool.API.Utils;
+using HRTool.API.Middleware;
 using HRTool.Application;
 using HRTool.Application.Services;
 using HRTool.Domain.Interfaces;
@@ -44,6 +45,9 @@ namespace HRTool.API
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
+
+            // Use global exception handler
+            app.UseCustomExceptionHandler(app.Services.GetRequiredService<ILoggerFactory>());
 
             app.UseHttpsRedirection();
 

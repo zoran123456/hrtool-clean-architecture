@@ -3,6 +3,7 @@ using HRTool.Application.Services;
 using HRTool.Domain.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -18,10 +19,12 @@ namespace HRTool.API.Controllers
     public class UserController : ControllerBase
     {
         private readonly UserService _userService;
+        private readonly ILogger<UserController> _logger;
 
-        public UserController(UserService userService)
+        public UserController(UserService userService, ILogger<UserController> logger)
         {
             _userService = userService;
+            _logger = logger;
         }
 
         /// <summary>
@@ -51,7 +54,11 @@ namespace HRTool.API.Controllers
                 return Unauthorized();
             var (success, error) = await _userService.UpdateProfileAsync(guid, dto);
             if (!success)
+            {
+                _logger.LogWarning("Failed profile update for user {UserId}: {Error}", guid, error);
                 return BadRequest(new { error });
+            }
+            _logger.LogInformation("User profile updated: {UserId}", guid);
             return NoContent();
         }
 
@@ -68,7 +75,11 @@ namespace HRTool.API.Controllers
                 return Unauthorized();
             var (success, error) = await _userService.SetOutOfOfficeAsync(guid, dto);
             if (!success)
+            {
+                _logger.LogWarning("Failed to set out-of-office for user {UserId}: {Error}", guid, error);
                 return BadRequest(new { error });
+            }
+            _logger.LogInformation("User set out-of-office: {UserId}", guid);
             return NoContent();
         }
 
@@ -132,7 +143,11 @@ namespace HRTool.API.Controllers
                 return BadRequest(ModelState);
             var (user, error) = await _userService.CreateUserAsync(dto);
             if (error != null)
+            {
+                _logger.LogWarning("Failed to create user: {Error}", error);
                 return Conflict(new { error });
+            }
+            _logger.LogInformation("Admin created user: {UserId}", user!.Id);
             return CreatedAtAction(nameof(GetAllUsers), new { id = user!.Id }, user);
         }
 
@@ -146,11 +161,19 @@ namespace HRTool.API.Controllers
             if (!success)
             {
                 if (error == "User not found")
+                {
+                    _logger.LogWarning("User not found for update: {UserId}", id);
                     return NotFound();
+                }
                 if (error != null && error.Contains("exists"))
+                {
+                    _logger.LogWarning("Conflict updating user {UserId}: {Error}", id, error);
                     return Conflict(new { error });
+                }
+                _logger.LogWarning("Failed to update user {UserId}: {Error}", id, error);
                 return BadRequest(new { error });
             }
+            _logger.LogInformation("Admin updated user: {UserId}", id);
             return NoContent();
         }
     }
