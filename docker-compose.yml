@@ -1,0 +1,14 @@
+# Optional docker-compose for development (mounts SQLite DB for inspection)
+version: '3.8'
+services:
+  hr-api:
+    build: .
+    ports:
+      - "5134:5134"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Data Source=app.db
+    volumes:
+      - ./HRTool.API/app.db:/app/app.db
+    # Uncomment to see logs in foreground
+    # command: ["dotnet", "HRTool.API.dll"]
