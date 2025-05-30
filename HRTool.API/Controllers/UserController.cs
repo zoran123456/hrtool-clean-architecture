@@ -127,6 +127,12 @@ namespace HRTool.API.Controllers
         }
 
         // ------------------- ADMIN ENDPOINTS -------------------
+
+        /// <summary>
+        /// Admin: Gets all users in the system.
+        /// </summary>
+        /// <returns>List of all users with admin details.</returns>
+        /// <response code="200">Returns the list of users</response>
         [HttpGet("admin/users")]
         [Authorize(Roles = "Admin")]
         public async Task<ActionResult<List<AdminUserListDto>>> GetAllUsers()
@@ -135,6 +141,13 @@ namespace HRTool.API.Controllers
             return Ok(users);
         }
 
+        /// <summary>
+        /// Admin: Creates a new user.
+        /// </summary>
+        /// <param name="dto">The user data to create.</param>
+        /// <returns>The created user.</returns>
+        /// <response code="201">Returns the newly created user</response>
+        /// <response code="409">If a user with the same email already exists</response>
         [HttpPost("admin/users")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> CreateUser([FromBody] AdminCreateUserDto dto)
@@ -151,6 +164,15 @@ namespace HRTool.API.Controllers
             return CreatedAtAction(nameof(GetAllUsers), new { id = user!.Id }, user);
         }
 
+        /// <summary>
+        /// Admin: Updates an existing user.
+        /// </summary>
+        /// <param name="id">The user id.</param>
+        /// <param name="dto">The updated user data.</param>
+        /// <returns>No content if successful.</returns>
+        /// <response code="204">User updated successfully</response>
+        /// <response code="404">User not found</response>
+        /// <response code="409">Conflict if email already exists</response>
         [HttpPut("admin/users/{id}")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> UpdateUser(Guid id, [FromBody] AdminUpdateUserDto dto)

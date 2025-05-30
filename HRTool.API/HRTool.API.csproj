@@ -26,4 +26,10 @@
     <ProjectReference Include="..\HRTool.Infrastructure\HRTool.Infrastructure.csproj" />
   </ItemGroup>
 
+    <PropertyGroup>
+	    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+	    <NoWarn>$(NoWarn);1591</NoWarn>
+	    <!-- (Optional) Hides missing XML comment warnings -->
+    </PropertyGroup>
+
 </Project>

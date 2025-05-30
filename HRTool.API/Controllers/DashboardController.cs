@@ -31,7 +31,15 @@ namespace HRTool.API.Controllers
         /// <summary>
         /// Gets all dashboard data for the current user in a single call.
         /// </summary>
+        /// <remarks>
+        /// Requires a valid JWT Bearer token. Returns greeting, notifications, out-of-office users, birthdays, new hires, and company links.
+        /// </remarks>
+        /// <returns>Aggregated dashboard data for the current user.</returns>
+        /// <response code="200">Returns the dashboard data</response>
+        /// <response code="401">If the user is not authenticated</response>
         [HttpGet]
+        [ProducesResponseType(typeof(DashboardDto), 200)]
+        [ProducesResponseType(401)]
         public async Task<IActionResult> GetDashboard()
         {
             // Get current user ID from JWT claims

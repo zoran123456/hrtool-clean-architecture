@@ -1,5 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
+using System.Reflection;
 
 namespace HRTool.API.Extensions
 {
@@ -9,7 +10,13 @@ namespace HRTool.API.Extensions
         {
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new() { Title = "HRTool API", Version = "v1" });
+                // Explicitly set OpenAPI version
+                c.SwaggerDoc("v1", new OpenApiInfo
+                {
+                    Title = "HRTool API",
+                    Version = "v1",
+                    Description = "HRTool API documentation (OpenAPI 3.0)"
+                });
                 // Add JWT Bearer support
                 c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
                 {
@@ -34,6 +41,13 @@ namespace HRTool.API.Extensions
                         new string[] {}
                     }
                 });
+                // Include XML comments for better docs
+                var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+                if (File.Exists(xmlPath))
+                {
+                    c.IncludeXmlComments(xmlPath);
+                }
             });
             return services;
         }
