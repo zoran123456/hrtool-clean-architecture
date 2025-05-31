@@ -13,14 +13,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HRTool.API", "HRTool.API\HR
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "HRTool.Domain.UnitTests", "HRTool.Domain.UnitTests", "{E48DE7E4-A36E-441E-A704-2D0E592D2FF9}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "HRTool.Application.UnitTests", "HRTool.Application.UnitTests", "{3BE0808F-1B6D-4770-B328-8BBA7A122D71}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "HRTool.Infrastructure.UnitTests", "HRTool.Infrastructure.UnitTests", "{1A5554B5-00EF-4232-833B-87086BD9A000}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "HRTool.API.IntegrationTests", "HRTool.API.IntegrationTests", "{243514AC-B1D5-47EA-8933-75E2662A656C}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -46,12 +38,6 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(NestedProjects) = preSolution
-		{E48DE7E4-A36E-441E-A704-2D0E592D2FF9} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
-		{3BE0808F-1B6D-4770-B328-8BBA7A122D71} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
-		{1A5554B5-00EF-4232-833B-87086BD9A000} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
-		{243514AC-B1D5-47EA-8933-75E2662A656C} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {3B691EE1-B9A7-4D53-90A9-AF8A8550FBE2}
