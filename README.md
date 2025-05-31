@@ -188,3 +188,10 @@ docker run -d -p 8080:8080 -e JWT_KEY=... -e HRTOOL_ADMIN_PASSWORD=... hrtool-ap
 **For any questions or issues, please open an issue or contact the maintainers.**
 
 ---
+
+## AI Assistance
+
+This project was developed with **assistance from AI tools**, including [ChatGPT (o4-mini-high)](https://openai.com/chatgpt) and [GitHub Copilot](https://github.com/features/copilot).
+AI was used for generating code, documentation, refactoring suggestions, troubleshooting, and accelerating overall development. All code and documentation were reviewed and adapted as needed by the project maintainer.
+
+---
