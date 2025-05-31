@@ -50,6 +50,34 @@ namespace HRTool.API.IntegrationTests
             tokenProp.GetString().Should().NotBeNullOrWhiteSpace();
         }
 
+        [Fact]
+        public async Task Directory_Endpoint_RequiresAuth_ReturnsUnauthorized_IfNoToken()
+        {
+            var client = _factory.CreateClient();
+            var response = await client.GetAsync("/api/directory");
+            response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+        }
+
+        [Fact]
+        public async Task Directory_Endpoint_ReturnsUsers_WhenAuthorized()
+        {
+            var client = _factory.CreateClient();
+            // Login to get token
+            var loginResponse = await client.PostAsJsonAsync("/api/auth/login", new { Email = "admin@hrtool.local", Password = "TestAdminPassword123!" });
+            loginResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+            var loginJson = await loginResponse.Content.ReadFromJsonAsync<JsonElement>();
+            loginJson.TryGetProperty("token", out var tokenProp).Should().BeTrue();
+            var token = tokenProp.GetString();
+            token.Should().NotBeNullOrWhiteSpace();
+
+            // Set token in Authorization header
+            client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+            var response = await client.GetAsync("/api/directory");
+            response.StatusCode.Should().Be(HttpStatusCode.OK);
+            var usersJson = await response.Content.ReadAsStringAsync();
+            usersJson.Should().NotBeNullOrWhiteSpace();
+        }
+
         // Add more integration tests for other endpoints as needed
     }
 }
