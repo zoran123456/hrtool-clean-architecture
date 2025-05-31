@@ -30,5 +30,19 @@ namespace HRTool.Application.UnitTests
             result!.FirstName.Should().Be("John");
             result.LastName.Should().Be("Doe");
         }
+
+        [Fact]
+        public async Task GetProfileAsync_ReturnsNull_WhenUserDoesNotExist()
+        {
+            var userId = Guid.NewGuid();
+            var userRepoMock = new Mock<IUserRepository>();
+            userRepoMock.Setup(r => r.GetByIdAsync(userId)).ReturnsAsync((User?)null);
+            var unitOfWorkMock = new Mock<IUnitOfWork>();
+            var service = new UserService(userRepoMock.Object, unitOfWorkMock.Object);
+
+            var result = await service.GetProfileAsync(userId);
+
+            result.Should().BeNull();
+        }
     }
 }
